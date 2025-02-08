@@ -66,7 +66,7 @@ const displayAllPet = (pets) => {
     }
 
     pets.forEach((pet) => {
-        const { image, breed, pet_name, date_of_birth, gender, price } = pet;
+        const { image, breed, pet_name, date_of_birth, gender, price,petId } = pet;
         const div = document.createElement("div");
         div.innerHTML =
             `
@@ -105,7 +105,7 @@ const displayAllPet = (pets) => {
       <img class="h-4 w-4" src="https://img.icons8.com/?size=24&id=82788&format=png"/>
       </div>
       <button class="btn btn-outline btn-success">Adopt</button>
-      <button class="btn btn-outline btn-success">Details</button>
+      <button onclick="loadDetails('${petId}')" class="btn btn-outline btn-success">Details</button>
     </div>
   </div>
 </div>
@@ -125,6 +125,59 @@ const LoadPetsByCategory = (category) => {
             displayAllPet(data.data);
         })
         .catch(err => console.log(err))
+}
+
+//Load Details By Category
+const loadDetails=(petId)=>{
+    fetch(`https://openapi.programming-hero.com/api/peddy/pet/${petId}`)
+    .then(res=>res.json())
+    .then(data=>displayPetDetails(data.petData))
+    .catch(err=>console.log(err))
+}
+//Display Details
+const displayPetDetails =(petInfo)=>{
+    const {breed,image,gender,pet_name,price,date_of_birth,pet_details,vaccinated_status}=petInfo;
+
+    const modalContainer = document.getElementById("modalContainer");
+
+    modalContainer.innerHTML =
+    `
+    <img class="w-[600px] h-[300px] rounded-lg object-cover" src=${image}/>
+    <h3 class="text-2xl font-bold my-4">${pet_name}</h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-2">
+
+    <div class="flex items-center gap-2 text-gray-500 font-semibold">
+    <img class="w-4 h-4" src="https://img.icons8.com/?size=24&id=X0RUL50ii037&format=png"/>
+    <span>Breed: ${breed ? breed : ""}</span>
+    </div>
+
+     <div class="flex items-center gap-2 text-gray-500 font-semibold">
+    <img class="w-4 h-4" src="https://img.icons8.com/?size=24&id=117762&format=png"/>
+    <span>Birth: ${date_of_birth ? date_of_birth : ""}</span>
+    </div>
+
+    <div class="flex items-center gap-2 text-gray-500 font-semibold">
+    <img class="w-4 h-4" src="https://img.icons8.com/?size=30&id=77877&format=png"/>
+    <span>Gender: ${gender ? gender : ""}</span>
+    </div>
+
+    <div class="flex items-center gap-2 text-gray-500 font-semibold">
+    <img class="w-4 h-4" src="https://img.icons8.com/?size=24&id=89392&format=png"/>
+    <span>Price: ${price ? price : ""}$</span>
+    </div>
+
+     <div class="flex items-center gap-2 text-gray-500 font-semibold">
+    <img class="w-4 h-4" src="https://img.icons8.com/?size=30&id=77877&format=png"/>
+    <span>Gender: ${vaccinated_status ? vaccinated_status : ""}</span>
+    </div>
+
+    </div>
+
+    <h4 class="text-lg font-semibold my-5">Details Information</h4>
+    <p>${pet_details}</p>
+    `
+    document.getElementById("customModal").showModal();
 }
 
 loadCategory();
