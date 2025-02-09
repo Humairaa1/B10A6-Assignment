@@ -10,4 +10,4 @@
 (5) Dynamic Modal for Pet Details.
 
 4. ES6 features used:Let and const, Destructuring,Promises,Arrow functions, For...of loop.
-# Live link to the deployed project: 
+# Live link to the deployed project: https://spectacular-cocada-5d6207.netlify.app/
