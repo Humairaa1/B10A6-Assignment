@@ -1,3 +1,7 @@
+//view button clicked
+document.getElementById("view-more-btn").addEventListener("click",function(){
+    document.getElementById("main-section").scrollIntoView({behavior:"smooth"})
+})
 //remove button class
 const removeBtnClass=()=>{
     const allBtn = document.getElementsByClassName("category-btn");
@@ -101,10 +105,10 @@ const displayAllPet = (pets) => {
     <div class="divider"></div>
 
     <div class="flex gap-2">
-      <div class="btn btn-outline ">
+      <div onclick="likeBtnClicked('${petId}')" class="btn btn-outline ">
       <img class="h-4 w-4" src="https://img.icons8.com/?size=24&id=82788&format=png"/>
       </div>
-      <button class="btn btn-outline btn-success">Adopt</button>
+      <button onclick="adoptButton()" class="btn btn-outline btn-success">Adopt</button>
       <button onclick="loadDetails('${petId}')" class="btn btn-outline btn-success">Details</button>
     </div>
   </div>
@@ -131,7 +135,9 @@ const LoadPetsByCategory = (category) => {
 const loadDetails=(petId)=>{
     fetch(`https://openapi.programming-hero.com/api/peddy/pet/${petId}`)
     .then(res=>res.json())
-    .then(data=>displayPetDetails(data.petData))
+    .then(data=>{
+        displayPetDetails(data.petData);
+    })
     .catch(err=>console.log(err))
 }
 //Display Details
@@ -178,6 +184,30 @@ const displayPetDetails =(petInfo)=>{
     <p>${pet_details}</p>
     `
     document.getElementById("customModal").showModal();
+}
+
+//Like Button clicked
+const likeBtnClicked =(petId)=>{
+    fetch(`https://openapi.programming-hero.com/api/peddy/pet/${petId}`)
+    .then(res=>res.json())
+    .then(data=>{
+        // console.log(data)
+        const petPhotoContainer =document.getElementById("pet-photo-container");
+        const div = document.createElement("div");
+        div.classList.add("h-[124px]")
+        div.innerHTML=
+        `
+        <img class="h-full" src=${data.petData.image}/>
+        `
+        petPhotoContainer.append(div)
+
+    })
+    .catch(err=>console.log(err))
+}
+
+//Adopt Button 
+const adoptButton=()=>{
+    console.log("hlw")
 }
 
 loadCategory();
