@@ -1,12 +1,13 @@
+let allPetsLocal = [];
 //view button clicked
-document.getElementById("view-more-btn").addEventListener("click",function(){
-    document.getElementById("main-section").scrollIntoView({behavior:"smooth"})
+document.getElementById("view-more-btn").addEventListener("click", function () {
+    document.getElementById("main-section").scrollIntoView({ behavior: "smooth" })
 })
 //remove button class
-const removeBtnClass=()=>{
+const removeBtnClass = () => {
     const allBtn = document.getElementsByClassName("category-btn");
     // console.log(allBtn)
-    for(let btn of allBtn){
+    for (let btn of allBtn) {
         btn.classList.remove("active")
     }
 }
@@ -28,7 +29,7 @@ const displayCategory = (categories) => {
         div.innerHTML =
             `
         <div 
-        onclick="LoadPetsByCategory('${category}')"
+        onclick="handleSearch('${category}')"
          class="border rounded-xl flex gap-2 justify-center items-center py-2 category-btn" 
          id="btn-${category}">
         <img class="w-10" src=${category_icon}/>
@@ -41,11 +42,26 @@ const displayCategory = (categories) => {
 }
 
 // All pets load
-const allPetLoad = () => {
-    fetch("https://openapi.programming-hero.com/api/peddy/pets")
-        .then(res => res.json())
-        .then(data => displayAllPet(data.pets))
+// const allPetLoad = () => {
+//     fetch("https://openapi.programming-hero.com/api/peddy/pets")
+//         .then(res => res.json())
+//         .then(data => {
+//             console.log(data.pets)
+//             allPetsLocal=data.pets;
+//             console.log(allPetsLocal)
+//             displayAllPet(data.pets);
+//         })
+// }
+const allPetLoad = async () => {
+
+    const res = await fetch("https://openapi.programming-hero.com/api/peddy/pets")
+
+    const data = await res.json();
+    allPetsLocal = data.pets;
+    displayAllPet(data.pets);
+
 }
+
 // display all pets
 const displayAllPet = (pets) => {
     const allPetContainer = document.getElementById("all-pet-container");
@@ -70,7 +86,7 @@ const displayAllPet = (pets) => {
     }
 
     pets.forEach((pet) => {
-        const { image, breed, pet_name, date_of_birth, gender, price,petId } = pet;
+        const { image, breed, pet_name, date_of_birth, gender, price, petId } = pet;
         const div = document.createElement("div");
         div.innerHTML =
             `
@@ -120,6 +136,9 @@ const displayAllPet = (pets) => {
 
 // load pets by category
 const LoadPetsByCategory = (category) => {
+
+    document.getElementById("round-loading").classList.add("hidden")
+
     fetch(`https://openapi.programming-hero.com/api/peddy/category/${category}`)
         .then(res => res.json())
         .then(data => {
@@ -132,22 +151,23 @@ const LoadPetsByCategory = (category) => {
 }
 
 //Load Details By Category
-const loadDetails=(petId)=>{
+const loadDetails = (petId) => {
     fetch(`https://openapi.programming-hero.com/api/peddy/pet/${petId}`)
-    .then(res=>res.json())
-    .then(data=>{
-        displayPetDetails(data.petData);
-    })
-    .catch(err=>console.log(err))
+        .then(res => res.json())
+        .then(data => {
+            displayPetDetails(data.petData);
+        })
+        .catch(err => console.log(err))
 }
 //Display Details
-const displayPetDetails =(petInfo)=>{
-    const {breed,image,gender,pet_name,price,date_of_birth,pet_details,vaccinated_status}=petInfo;
+const displayPetDetails = (petInfo) => {
+    const { breed, image, gender, pet_name, price, date_of_birth, pet_details, vaccinated_status } = petInfo;
 
     const modalContainer = document.getElementById("modalContainer");
 
+
     modalContainer.innerHTML =
-    `
+        `
     <img class="w-[600px] h-[300px] rounded-lg object-cover" src=${image}/>
     <h3 class="text-2xl font-bold my-4">${pet_name}</h3>
 
@@ -187,27 +207,52 @@ const displayPetDetails =(petInfo)=>{
 }
 
 //Like Button clicked
-const likeBtnClicked =(petId)=>{
+const likeBtnClicked = (petId) => {
     fetch(`https://openapi.programming-hero.com/api/peddy/pet/${petId}`)
-    .then(res=>res.json())
-    .then(data=>{
-        // console.log(data)
-        const petPhotoContainer =document.getElementById("pet-photo-container");
-        const div = document.createElement("div");
-        div.classList.add("h-[124px]")
-        div.innerHTML=
-        `
+        .then(res => res.json())
+        .then(data => {
+            // console.log(data)
+            const petPhotoContainer = document.getElementById("pet-photo-container");
+            const div = document.createElement("div");
+            div.classList.add("h-[124px]")
+            div.innerHTML =
+                `
         <img class="h-full" src=${data.petData.image}/>
         `
-        petPhotoContainer.append(div)
+            petPhotoContainer.append(div)
 
-    })
-    .catch(err=>console.log(err))
+        })
+        .catch(err => console.log(err))
 }
 
 //Adopt Button 
-const adoptButton=()=>{
+const adoptButton = () => {
     console.log("hlw")
+}
+
+//spiner added
+const handleSearch = (category) => {
+
+    document.getElementById("round-loading").classList.remove("hidden")
+
+    setTimeout(function () {
+        LoadPetsByCategory(category)
+    }, 2000)
+}
+
+
+//shortByPrice
+const sortByPrice = () => {
+
+    (async () => {
+        await allPetLoad();
+
+        const sortedPets = [...allPetsLocal].sort((a, b) => b.price - a.price);
+        displayAllPet(sortedPets);
+
+        console.log("After fetch:", allPetsLocal); // Now allPetsLocal has data
+    })();
+
 }
 
 loadCategory();
